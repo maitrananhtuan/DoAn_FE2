@@ -1,9 +1,9 @@
 import styles from "../css/app.module.css";
 
 const SlideShow = () => {
-    return(
-        <div>
-            <div className={styles["main-slideshow"]}>
+  return (
+    <div>
+      <div className={styles["main-slideshow"]}>
         <div className={styles["slideshow"]}>
           <div className={styles["image-slideshow"]}>
             <img src="../image/500K-1200x630-1-scaled.jpg"></img>
@@ -22,8 +22,8 @@ const SlideShow = () => {
           </div>
         </div>
       </div>
-        </div>
-    );
+    </div>
+  );
 };
 
 export default SlideShow;

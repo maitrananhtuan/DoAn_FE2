@@ -30,18 +30,6 @@ const NavBar = () => {
                 <li>
                   <a href="#">ROG Phone</a>
                 </li>
-                <li>
-                  <a href="#">ROG Phone</a>
-                </li>
-                <li>
-                  <a href="#">ROG Phone</a>
-                </li>
-                <li>
-                  <a href="#">ROG Phone</a>
-                </li>
-                <li>
-                  <a href="#">ROG Phone</a>
-                </li>
               </ul>
             </li>
             <li>
