@@ -146,6 +146,33 @@
   margin: 10px;
 }
 
+.product-recommend h2 {
+  color: black;
+  font-size: 30px;
+  font-weight: 700;
+  margin: 20px;
+}
+
+.product-recommend .main-card {
+  display: flex;
+  overflow: hidden; /* Ẩn các sản phẩm tràn ra ngoài */
+  width: 100%;
+  position: relative;
+  transition: transform 0.5s ease-out;
+}
+
+.product-recommend .card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  text-align: center;
+  min-width: calc(20% - 10px); /* Sản phẩm chiếm 20% chiều rộng của main-card và tạo ra khoảng cách giữa các sản phẩm */
+  margin-right: 10px; /* Khoảng cách giữa các sản phẩm */
+  transition: .5s;
+}
+
 /* Sản phẩm */
 
 .product-wrapper {
@@ -166,20 +193,20 @@
   margin: 10px;
 }
 
-.product-recommend h2 {
+.product h2 {
   color: black;
   font-size: 30px;
   font-weight: 700;
   margin: 20px;
 }
 
-.main-card {
+.product .main-card {
   display: flex;
   flex-wrap: wrap; /* Cho phép các sản phẩm tự động xuống dòng khi không đủ không gian */
   justify-content: space-between; /* Canh các sản phẩm theo cả hai cạnh */
 }
 
-.card {
+.product .card {
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -188,6 +215,11 @@
   text-align: center;
   width: calc(20% - 10px); /* Sản phẩm chiếm 20% chiều rộng của main-card và tạo ra khoảng cách giữa các sản phẩm */
   margin-bottom: 20px; /* Khoảng cách dưới cùng của mỗi sản phẩm */
+  transition: .5s;
+}
+
+.product .card:hover {
+    transform: scale(1.1);
 }
 
 .card img {
@@ -198,7 +230,7 @@
   transition: .5s;
 }
 
-.card img:hover {
+.product .card img:hover {
     transform: scale(1.1);
 }
 
