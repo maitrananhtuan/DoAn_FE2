@@ -4,9 +4,12 @@ import { useEffect, useRef } from "react";
 import styles from "../css/app.module.css";
 import useIntersectionObserver from "../hooks/scroll";
 
-const Products = () => {
-  const [ref, isIntersecting] = useIntersectionObserver({ threshold: 0.2 });
+const ProductCard = () => {
 
+  // animation scroll
+  const [ref, isIntersecting] = useIntersectionObserver({ threshold: 0.1 });
+
+  // animation slideshow các card sản phẩm đề xuất
   const mainCardRef = useRef(null);
 
   useEffect(() => {
@@ -38,6 +41,36 @@ const Products = () => {
       mainCard.removeEventListener("transitionend", transitionEndHandler);
     };
   }, []);
+
+  // animation sản phẩm
+
+  const cardRefs = useRef([]);
+
+  useEffect(() => {
+    const refsArray = cardRefs.current;
+    const observers = refsArray.map((ref) => {
+      const observer = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting) {
+          ref.classList.add(styles.visible);
+        }
+      }, { threshold: 0.1 });
+
+      if (ref) {
+        observer.observe(ref);
+      }
+
+      return observer;
+    });
+
+    return () => {
+      observers.forEach((observer, index) => {
+        if (refsArray[index]) {
+          observer.unobserve(refsArray[index]);
+        }
+      });
+    };
+  }, []);
+
   return (
     <div>
       {/* Sản phẩm đề xuất */}
@@ -142,6 +175,7 @@ const Products = () => {
           </div>
         </div>
       </div>
+      {/* Sản phẩm */}
       <div ref={ref}
       className={`${styles.productRecommendWrapper} ${
         isIntersecting ? styles.visible : styles.hidden
@@ -160,7 +194,7 @@ const Products = () => {
                   alt="Product 1"
                 />
                 <h3>Product 1</h3>
-                <p className={styles["price"]}>$100</p>
+                <p className={styles["price"]}></p>
                 <p className={styles["details"]}>
                   This is the detail of product 1. It has many features and
                   benefits.
@@ -274,4 +308,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default ProductCard;

@@ -1,7 +1,10 @@
+"use client";
+
 import React from 'react';
 import styles from "../css/app.module.css";
 
 const FooterProduct = () => {
+
     return (
         <div>
             <footer className={styles.footer}>

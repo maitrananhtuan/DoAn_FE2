@@ -1,6 +1,7 @@
 import FooterProduct from "./Footer";
 import NavBar from "./NavBar";
-import Products from "./Products";
+import ProductCard from "./ProductCard";
+import Products from "./ProductCard";
 import SlideShow from "./SlideShow";
 
 const HomeProduct = () => {
@@ -8,7 +9,7 @@ const HomeProduct = () => {
         <div>
             <NavBar/>
             <SlideShow/>
-            <Products/>
+            <ProductCard/>
             <FooterProduct/>
         </div>
     );
