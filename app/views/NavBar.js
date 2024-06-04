@@ -6,14 +6,14 @@ const NavBar = () => {
       <div className={styles["header"]}>
         <nav className={styles["container"]}>
           <a className={styles["logo"]} href="#">
-            SMART PHONE
+          TechZone
           </a>
           <ul className={styles["main-menu"]}>
             <li>
-              <a href="#">Trang chủ</a>
+              <a href="/">Trang chủ</a>
             </li>
             <li>
-              <a href="#">Giới thiệu</a>
+              <a href="/pages/introduce">Giới thiệu</a>
             </li>
             <li>
               <a href="/product">Sản phẩm &#9660;</a>
@@ -33,12 +33,12 @@ const NavBar = () => {
               </ul>
             </li>
             <li>
-              <a href="#">Liên hệ</a>
+              <a href="/pages/contact">Liên hệ</a>
             </li>
           </ul>
           <ul className={styles["main-menu"]}>
             <li>
-              <a href="/auth/login">Đăng nhập</a>
+              <a href="#">Đăng nhập</a>
             </li>
             <li>
               <a href="#">Đăng ký</a>

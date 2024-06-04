@@ -1,0 +1,155 @@
+/* app.module.css */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.5); }
+  to { transform: scale(1); }
+}
+
+.container {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  color: #333;
+  line-height: 1.6;
+  overflow: hidden;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 20px;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 2s ease-in-out;
+}
+
+.heroImage {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  animation: slideIn 2s ease-in-out;
+}
+
+.section {
+  margin-bottom: 40px;
+  animation: fadeIn 2s ease-in-out;
+}
+
+.sectionTitle {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 2em;
+  color: #007bff;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  justify-items: center; /* Thêm dòng này để căn giữa các phần tử */
+}
+
+.feature {
+  text-align: center;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+  animation: zoomIn 1s ease-in-out;
+}
+
+.featureIcon {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 10px;
+  display: block; /* Đảm bảo ảnh là khối */
+  margin-left: auto; /* Thêm margin-left auto */
+  margin-right: auto; /* Thêm margin-right auto */
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.product {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease-in-out;
+  margin: 10px;
+}
+
+.productHover {
+  transform: translateY(-5px);
+}
+
+.productImage {
+  width: 100%;
+  height: auto;
+  transition: transform 0.3s ease-in-out;
+}
+
+.productImageHover {
+  transform: scale(1.05);
+}
+
+.productDetails {
+  padding: 20px;
+  text-align: center;
+}
+
+.productTitle {
+  margin-top: 0;
+  font-size: 1.2em;
+  color: #007bff;
+}
+
+.productPrice {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #333;
+}
+
+.viewAllButton {
+  display: block;
+  margin: 0 auto;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  animation: fadeIn 2s ease-in-out;
+}
+
+.testimonials {
+  text-align: center;
+}
+
+.testimonial {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  font-style: italic;
+  animation: fadeIn 2s ease-in-out;
+}
