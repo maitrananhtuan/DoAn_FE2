@@ -3,7 +3,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import styles from '../../css/introduction.module.css';
+import styles from '../css/introduction.module.css';
 import NavBar from '@/app/views/NavBar';
 import FooterProduct from '@/app/views/Footer';
 

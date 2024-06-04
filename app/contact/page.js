@@ -1,7 +1,7 @@
 // Trong file ContactPage.js
 
 import React from 'react';
-import styles from "../../css/contact.module.css";
+import styles from "../css/contact.module.css";
 import NavBar from '@/app/views/NavBar';
 import FooterProduct from '@/app/views/Footer';
 

@@ -157,6 +157,7 @@ const ProductCard = () => {
                 <div
                   key={product.id}
                   className={`${styles.card} `}
+                  onClick={handleProductClick}
                 >
                   <img
                     src={`/image/${product.image}`}

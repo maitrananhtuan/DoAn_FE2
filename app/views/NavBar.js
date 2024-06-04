@@ -13,7 +13,7 @@ const NavBar = () => {
               <a href="/">Trang chủ</a>
             </li>
             <li>
-              <a href="/pages/introduce">Giới thiệu</a>
+              <a href="/introduce">Giới thiệu</a>
             </li>
             <li>
               <a href="/product">Sản phẩm &#9660;</a>
@@ -33,7 +33,7 @@ const NavBar = () => {
               </ul>
             </li>
             <li>
-              <a href="/pages/contact">Liên hệ</a>
+              <a href="/contact">Liên hệ</a>
             </li>
           </ul>
           <ul className={styles["main-menu"]}>
