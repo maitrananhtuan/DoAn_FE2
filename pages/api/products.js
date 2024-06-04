@@ -9,7 +9,6 @@ export default async function handler(req, res) {
       try {
         // Gọi hàm getAllProducts để lấy tất cả sản phẩm từ cơ sở dữ liệu
         const products = await getAllProducts();
-  
         // Trả về kết quả dưới dạng JSON
         res.status(200).json(products);
       } catch (error) {

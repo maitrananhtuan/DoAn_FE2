@@ -364,3 +364,29 @@
   height: 120px;
   animation: spin 2s linear infinite;
 }
+
+/* CSS cho wrapper chứa các biểu tượng */
+.icons {
+  display: flex;
+  align-items: center;
+}
+
+/* CSS cho mỗi biểu tượng */
+.icons span {
+  margin-right: 10px; /* Khoảng cách giữa các biểu tượng */
+}
+
+/* CSS cho biểu tượng xem */
+.view-icon {
+  color: #888; /* Màu sắc của biểu tượng xem */
+}
+
+/* CSS cho biểu tượng yêu thích */
+.like-icon {
+  color: #ff0000; /* Màu sắc của biểu tượng yêu thích */
+  cursor: pointer; /* Đổi con trỏ chuột thành hình bàn tay khi di chuột qua biểu tượng */
+}
+
+.liked {
+  color: red; /* Màu của biểu tượng trái tim khi đã được like */
+}

@@ -3,22 +3,38 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "../css/app.module.css";
 import useIntersectionObserver from "../hooks/scroll";
-import axios from 'axios';
+import axios from "axios";
+import styled from "styled-components";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faHeart } from "@fortawesome/free-solid-svg-icons";
+
+function stripHtmlTags(html) {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return doc.body.textContent || "";
+}
 
 const ProductCard = () => {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [likedProducts, setLikedProducts] = useState([]);
+
+  const MainCard = styled.div`
+  transition: transform 0.5s ease;
+  transform: translateY(${props => (props.isModalOpen ? '-100%' : '0')});
+  visibility: ${props => (props.isModalOpen ? 'hidden' : 'visible')};
+  opacity: ${props => (props.isModalOpen ? '0' : '1')};
+`;
 
   // Fetch product data
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('/api/products');
+        const response = await axios.get("/api/products");
         setProducts(response.data);
       } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error("Error fetching products:", error);
       }
     };
 
@@ -35,8 +51,61 @@ const ProductCard = () => {
     }, 1000);
   };
 
-  // Chuyển tự động các card
+  // tăng view
+  const handleViewClick = async (productId) => {
+    try {
+      const response = await axios.post("/api/viewProducts", { productId });
+      console.log("Response from server:", response.data);
+      // Nếu kết nối thành công với endpoint API và tăng số lượng view thành công, bạn có thể thực hiện các thao tác tiếp theo ở đây
+      // Ví dụ: cập nhật giao diện người dùng để hiển thị số lượng view mới
+      const updatedProducts = products.map((product) =>
+        product.id === productId
+          ? { ...product, views: product.views + 1 }
+          : product
+      );
+      setProducts(updatedProducts);
+    } catch (error) {
+      console.error("Error increasing view count:", error);
+      // Xử lý lỗi nếu gặp phải
+    }
+  };
 
+  // Load liked products from localStorage on component mount
+  useEffect(() => {
+    const likedProductsFromStorage = localStorage.getItem("likedProducts");
+    if (likedProductsFromStorage) {
+      setLikedProducts(JSON.parse(likedProductsFromStorage));
+    }
+  }, []);
+
+  // tăng like
+  const handleLikeClick = async (productId) => {
+    try {
+      // Kiểm tra xem sản phẩm đã được like trước đó chưa
+      if (!likedProducts.includes(productId)) {
+        // Nếu sản phẩm chưa được like, thực hiện tăng số lượng like và cập nhật trạng thái đã like
+        const response = await axios.post("/api/likeProducts", { productId });
+        console.log("Response from server:", response.data);
+
+        // Tăng số lượng like
+        const updatedProducts = products.map((product) =>
+          product.id === productId ? { ...product, likes: product.likes + 1 } : product
+        );
+        setProducts(updatedProducts);
+
+        // Cập nhật trạng thái đã like của sản phẩm
+        setLikedProducts([...likedProducts, productId]);
+
+        // Lưu danh sách các sản phẩm đã được like vào localStorage
+        localStorage.setItem("likedProducts", JSON.stringify([...likedProducts, productId]));
+      }
+    } catch (error) {
+      console.error("Error increasing view count:", error);
+      // Xử lý lỗi nếu gặp phải
+    }
+  };
+
+  // Chuyển tự động các card
   const mainCardRef = useRef(null);
 
   useEffect(() => {
@@ -106,15 +175,9 @@ const ProductCard = () => {
         <div className={styles["product-recommend"]}>
           <h2>Sản phẩm đề xuất</h2>
           <div className={styles["main-card"]} ref={mainCardRef}>
-            {products.map(product => (
-              <div
-                key={product.id}
-                className={`${styles.card} `}
-              >
-                <img
-                  src={`/image/${product.image}`}
-                  alt={product.name}
-                />
+            {products.map((product) => (
+              <div key={product.id} className={`${styles.card} `}>
+                <img src={`/image/${product.image}`} alt={product.name} />
                 <h3>{product.name}</h3>
                 <p className={styles["price"]}>{product.price}</p>
               </div>
@@ -123,37 +186,58 @@ const ProductCard = () => {
         </div>
       </div>
       {/* Danh sách sản phẩm */}
+
+      <MainCard isModalOpen={isModalOpen}>
       <div className={styles["productRecommendWrapper"]}>
         <div className={styles["product-wrapper"]}>
           <div className={styles["product"]}>
             <h2>Sản phẩm</h2>
             <div className={styles["main-card"]}>
-              {products.map(product => (
+              {products.map((product) => (
                 <div
                   key={product.id}
                   className={`${styles.card} `}
-                  onClick={() => handleProductClick(product)}
+                  onClick={() => {
+                    handleProductClick(product);
+                    handleViewClick(product.id);
+                  }}
                 >
-                  <img
-                    src={`/image/${product.image}`}
-                    alt={product.name}
-                  />
+                  <img src={`/image/${product.image}`} alt={product.name} />
                   <h3>{product.name}</h3>
                   <p className={styles["price"]}>{product.price}</p>
+                  <div className={styles.icons}>
+                    <span className={styles.viewIcon}>
+                      <FontAwesomeIcon icon={faEye} />
+                      {product.views}
+                    </span>
+
+                    <span className={styles.likeIcon}>
+                      <FontAwesomeIcon
+                        icon={faHeart}
+                        onClick={(e) => {
+                          e.stopPropagation(); // Ngăn chặn sự kiện click lan sang phần tử cha
+                          handleLikeClick(product.id);
+                        }}
+                        style={{ color: likedProducts.includes(product.id) ? 'red' : 'black' }}
+                      />
+                      {product.likes}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
       </div>
+      </MainCard>
       {/* Hiệu ứng loading */}
       {isLoading && (
         <div className="fixed top-0 left-0 right-0 bottom-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center">
-        <div className="relative flex items-center justify-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-800"></div>
-          <div className="absolute text-white text-xl">Loading...</div>
+          <div className="relative flex items-center justify-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-800"></div>
+            <div className="absolute text-white text-xl">Loading...</div>
+          </div>
         </div>
-      </div>
       )}
       {/* Modal */}
       {isModalOpen && (
@@ -174,12 +258,16 @@ const ProductCard = () => {
             <div className="inline-block align-middle bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full max-w-4xl">
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                  <h3
-                    className="text-lg leading-6 font-medium text-gray-900"
-                    id="modal-title"
-                  >
-                    {selectedProduct ? selectedProduct.name : ""}
-                  </h3>
+                <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex justify-between items-center">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                      {selectedProduct ? selectedProduct.name : ""}
+                    </h3>
+                    <button type="button" onClick={() => setIsModalOpen(false)} className="bg-transparent border-0 p-0 leading-none text-black opacity-50 cursor-pointer focus:outline-none" data-bs-dismiss="modal" aria-label="Close">
+                      <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
                   <hr className="my-2 border-b-2 border-gray-300" />
                   <div className="flex items-center sm:flex-row sm:items-start sm:justify-start">
                     <div className="sm:mr-4">
@@ -194,7 +282,7 @@ const ProductCard = () => {
                         {selectedProduct.price}
                       </h3>
                       <p className="text-gray-700 h-full overflow-auto h-64">
-                        {selectedProduct.description}
+                        {stripHtmlTags(selectedProduct.description)}
                       </p>
                     </div>
                   </div>
