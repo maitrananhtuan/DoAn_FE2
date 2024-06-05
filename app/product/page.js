@@ -40,6 +40,17 @@ export default function Products() {
                   />
                   <h3>{product.name}</h3>
                   <p className={styles["price"]}>{product.price}</p>
+                  <div className={styles.buttons}>
+                    <span>
+                      <a className={styles["button-buy"]}>Buy</a>
+                    </span>
+                  </div>
+                  <div className={styles.addtocart}>
+                    <span>
+                      <button class={styles["purchase-button"]} data-content="Add to cart">Add to cart</button>
+                      {/* <a className={styles["button-buy"]}>Add to cart</a> */}
+                    </span>
+                  </div>
                   {/* <p className={styles["details"]}>{product.description}</p> */}
                 </div>
               ))}
