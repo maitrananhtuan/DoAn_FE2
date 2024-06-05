@@ -1,4 +1,5 @@
 import styles from "../css/app.module.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const NavBar = () => {
   return (
@@ -6,7 +7,7 @@ const NavBar = () => {
       <div className={styles["header"]}>
         <nav className={styles["container"]}>
           <a className={styles["logo"]} href="#">
-          TechZone
+            TechZone
           </a>
           <ul className={styles["main-menu"]}>
             <li>
