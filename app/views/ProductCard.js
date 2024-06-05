@@ -19,6 +19,8 @@ const ProductCard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [likedProducts, setLikedProducts] = useState([]);
+  const [cartItems, setCartItems] = useState([]);
+  const [cartItemCount, setCartItemCount] = useState(0); // Biến state để lưu số lượng sản phẩm trong giỏ hàng
 
   const MainCard = styled.div`
   transition: transform 0.5s ease;
@@ -168,6 +170,27 @@ const ProductCard = () => {
     };
   }, []);
 
+  // Load cart items from localStorage on component mount
+  useEffect(() => {
+    const cartItemsFromStorage = localStorage.getItem("cartItems");
+    if (cartItemsFromStorage) {
+      setCartItems(JSON.parse(cartItemsFromStorage));
+    }
+  }, []);
+
+  // Function to handle adding a product to cart
+  const handleAddToCart = (product) => {
+    // Check if the product is already in cart
+    if (!cartItems.some(item => item.id === product.id)) {
+      // If not, add it to cart
+      const updatedCartItems = [...cartItems, { id: product.id, name: product.name, price: product.price, image: product.image }];
+      setCartItems(updatedCartItems);
+      localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
+      setCartItemCount(updatedCartItems.length); // Cập nhật số lượng sản phẩm trong giỏ hàng
+      localStorage.setItem("cartCount", updatedCartItems.length);
+    }
+  };
+
   return (
     <div>
       {/* Sản phẩm đề xuất */}
@@ -197,12 +220,13 @@ const ProductCard = () => {
                   <div
                     key={product.id}
                     className={`${styles.card} `}
-                    onClick={() => {
-                      handleProductClick(product);
-                      handleViewClick(product.id);
-                    }}
+
                   >
-                    <img src={`/image/${product.image}`} alt={product.name} />
+                    <img src={`/image/${product.image}`} alt={product.name}
+                      onClick={() => {
+                        handleProductClick(product);
+                        handleViewClick(product.id);
+                      }} />
                     <h3>{product.name}</h3>
                     <p className={styles["price"]}>{product.price}</p>
                     <div className={styles.icons}>
@@ -221,6 +245,18 @@ const ProductCard = () => {
                           style={{ color: likedProducts.includes(product.id) ? 'red' : 'black' }}
                         />
                         {product.likes}
+                      </span>
+
+                    </div>
+                    <div className={styles.buttons}>
+                      <span>
+                        <a className={styles["button-buy"]}>Buy</a>
+                      </span>
+                    </div>
+                    <div className={styles.addtocart}>
+                      <span>
+                        <button class={styles["purchase-button"]} data-content="Add to cart" onClick={() => handleAddToCart(product)}>Add to cart</button>
+                        {/* <a className={styles["button-buy"]}>Add to cart</a> */}
                       </span>
                     </div>
                   </div>

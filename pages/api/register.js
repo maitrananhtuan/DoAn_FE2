@@ -1,22 +1,51 @@
-// register.api.js
+// pages/api/register.js
 
-import { registerUser } from '../../app/utils/register';
+import mysql from 'mysql';
+import bcrypt from 'bcrypt';
+
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'be1'
+});
+
+async function registerUser(name, email, password) {
+  return new Promise((resolve, reject) => {
+    bcrypt.hash(password, 10, (err, hashedPassword) => {
+      if (err) {
+        return reject(err);
+      }
+
+      const query = 'INSERT INTO users (name, email, password) VALUES (?, ?, ?)';
+      connection.query(query, [name, email, hashedPassword], (error, results) => {
+        if (error) {
+          return reject(error);
+        }
+        resolve(results);
+      });
+    });
+  });
+}
 
 export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    try {
-      // Lấy thông tin đăng ký từ body của yêu cầu
-      const { name, email, password } = req.body;
-      // Gọi hàm đăng ký tài khoản mới
-      await registerUser(name, email, password);
-      // Trả về kết quả thành công
-      res.status(200).json({ message: 'Đăng ký tài khoản thành công' });
-    } catch (error) {
-      // Nếu có lỗi xảy ra trong quá trình truy vấn, trả về lỗi 500 và thông báo lỗi
-      res.status(500).json({ message: 'Lỗi nội bộ' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Method not allowed' });
+  }
+
+  const { name, email, password } = req.body;
+
+  if (!name || !email || !password) {
+    return res.status(400).json({ message: 'Vui lòng điền đầy đủ thông tin' });
+  }
+
+  try {
+    const results = await registerUser(name, email, password);
+    return res.status(200).json({ message: 'Đăng ký thành công', results });
+  } catch (error) {
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.status(400).json({ message: 'Email đã được sử dụng' });
     }
-  } else {
-    // Nếu phương thức yêu cầu không được hỗ trợ, trả về mã lỗi phù hợp
-    res.status(405).end();
+    return res.status(500).json({ message: 'Lỗi server', error });
   }
 }
