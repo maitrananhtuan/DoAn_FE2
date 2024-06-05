@@ -188,47 +188,47 @@ const ProductCard = () => {
       {/* Danh sách sản phẩm */}
 
       <MainCard isModalOpen={isModalOpen}>
-      <div className={styles["productRecommendWrapper"]}>
-        <div className={styles["product-wrapper"]}>
-          <div className={styles["product"]}>
-            <h2>Sản phẩm</h2>
-            <div className={styles["main-card"]}>
-              {products.map((product) => (
-                <div
-                  key={product.id}
-                  className={`${styles.card} `}
-                  onClick={() => {
-                    handleProductClick(product);
-                    handleViewClick(product.id);
-                  }}
-                >
-                  <img src={`/image/${product.image}`} alt={product.name} />
-                  <h3>{product.name}</h3>
-                  <p className={styles["price"]}>{product.price}</p>
-                  <div className={styles.icons}>
-                    <span className={styles.viewIcon}>
-                      <FontAwesomeIcon icon={faEye} />
-                      {product.views}
-                    </span>
+        <div className={styles["productRecommendWrapper"]}>
+          <div className={styles["product-wrapper"]}>
+            <div className={styles["product"]}>
+              <h2>Sản phẩm</h2>
+              <div className={styles["main-card"]}>
+                {products.map((product) => (
+                  <div
+                    key={product.id}
+                    className={`${styles.card} `}
+                    onClick={() => {
+                      handleProductClick(product);
+                      handleViewClick(product.id);
+                    }}
+                  >
+                    <img src={`/image/${product.image}`} alt={product.name} />
+                    <h3>{product.name}</h3>
+                    <p className={styles["price"]}>{product.price}</p>
+                    <div className={styles.icons}>
+                      <span className={styles.viewIcon}>
+                        <FontAwesomeIcon icon={faEye} />
+                        {product.views}
+                      </span>
 
-                    <span className={styles.likeIcon}>
-                      <FontAwesomeIcon
-                        icon={faHeart}
-                        onClick={(e) => {
-                          e.stopPropagation(); // Ngăn chặn sự kiện click lan sang phần tử cha
-                          handleLikeClick(product.id);
-                        }}
-                        style={{ color: likedProducts.includes(product.id) ? 'red' : 'black' }}
-                      />
-                      {product.likes}
-                    </span>
+                      <span className={styles.likeIcon}>
+                        <FontAwesomeIcon
+                          icon={faHeart}
+                          onClick={(e) => {
+                            e.stopPropagation(); // Ngăn chặn sự kiện click lan sang phần tử cha
+                            handleLikeClick(product.id);
+                          }}
+                          style={{ color: likedProducts.includes(product.id) ? 'red' : 'black' }}
+                        />
+                        {product.likes}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
       </MainCard>
       {/* Hiệu ứng loading */}
       {isLoading && (
@@ -258,7 +258,7 @@ const ProductCard = () => {
             <div className="inline-block align-middle bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full max-w-4xl">
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex justify-between items-center">
+                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex justify-between items-center">
                     <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
                       {selectedProduct ? selectedProduct.name : ""}
                     </h3>

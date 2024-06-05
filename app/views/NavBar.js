@@ -1,4 +1,5 @@
 import styles from "../css/app.module.css";
+import RegisterForm from '../register/page';
 
 const NavBar = () => {
   return (
@@ -6,7 +7,7 @@ const NavBar = () => {
       <div className={styles["header"]}>
         <nav className={styles["container"]}>
           <a className={styles["logo"]} href="#">
-          TechZone
+            TechZone
           </a>
           <ul className={styles["main-menu"]}>
             <li>
@@ -38,10 +39,10 @@ const NavBar = () => {
           </ul>
           <ul className={styles["main-menu"]}>
             <li>
-              <a href="#">Đăng nhập</a>
+              <a href="/login">Đăng nhập</a>
             </li>
             <li>
-              <a href="#">Đăng ký</a>
+              <a href="/register">Đăng ký</a>
             </li>
           </ul>
         </nav>
