@@ -7,6 +7,7 @@ import axios from "axios";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faHeart } from "@fortawesome/free-solid-svg-icons";
+import { StyleSheetManager } from 'styled-components';
 
 function stripHtmlTags(html) {
   const doc = new DOMParser().parseFromString(html, "text/html");
@@ -26,6 +27,14 @@ const ProductCard = () => {
   visibility: ${props => (props.isModalOpen ? 'hidden' : 'visible')};
   opacity: ${props => (props.isModalOpen ? '0' : '1')};
 `;
+
+const WrapperComponent = ({ children }) => {
+  return (
+    <StyleSheetManager shouldForwardProp={(prop) => prop !== 'isModalOpen'}>
+      {children}
+    </StyleSheetManager>
+  );
+};
 
   // Fetch product data
   useEffect(() => {
@@ -186,13 +195,13 @@ const ProductCard = () => {
         </div>
       </div>
       {/* Danh sách sản phẩm */}
-
-      <MainCard isModalOpen={isModalOpen}>
+          <WrapperComponent>
+          <MainCard isModalOpen={isModalOpen}>
       <div className={styles["productRecommendWrapper"]}>
         <div className={styles["product-wrapper"]}>
           <div className={styles["product"]}>
             <h2>Sản phẩm</h2>
-            <div className={styles["main-card"]}>
+            <div className={`${styles["main-card"]} ${isModalOpen ? "modal-open" : ""}`}>
               {products.map((product) => (
                 <div
                   key={product.id}
@@ -230,6 +239,7 @@ const ProductCard = () => {
         </div>
       </div>
       </MainCard>
+          </WrapperComponent>
       {/* Hiệu ứng loading */}
       {isLoading && (
         <div className="fixed top-0 left-0 right-0 bottom-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center">
