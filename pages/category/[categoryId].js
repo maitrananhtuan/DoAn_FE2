@@ -1,25 +1,30 @@
+// pages/category/[categoryId].js
+
 "use client";
 
+import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import styles from "../css/app.module.css";
-import useIntersectionObserver from "../hooks/scroll";
 import axios from "axios";
-import styled from "styled-components";
+import NavBar from "@/app/views/NavBar";
+import styles from "@/app/css/app.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faHeart } from "@fortawesome/free-solid-svg-icons";
 import { StyleSheetManager } from 'styled-components';
+import styled from "styled-components";
 
 function stripHtmlTags(html) {
-  const doc = new DOMParser().parseFromString(html, "text/html");
-  return doc.body.textContent || "";
-}
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    return doc.body.textContent || "";
+  }
 
-const ProductCard = () => {
+const CategoryPage = () => {
+  const router = useRouter();
+  const { categoryId } = router.query;
   const [products, setProducts] = useState([]);
+  const [likedProducts, setLikedProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [likedProducts, setLikedProducts] = useState([]);
 
   const MainCard = styled.div`
   transition: transform 0.5s ease;
@@ -50,6 +55,21 @@ const WrapperComponent = ({ children }) => {
     fetchProducts();
   }, []);
 
+  useEffect(() => {
+    const fetchProductsByCategory = async () => {
+        try {
+          const response = await axios.get(`/api/category_id?categoryId=${categoryId}`);
+          setProducts(response.data);
+        } catch (error) {
+          console.error("Error fetching products by category:", error);
+        }
+      };
+
+    if (categoryId) {
+      fetchProductsByCategory();
+    }
+  }, [categoryId]);
+
   const handleProductClick = (product) => {
     setIsLoading(true); // Hiệu ứng loading
 
@@ -79,7 +99,6 @@ const WrapperComponent = ({ children }) => {
     }
   };
 
-  // Load liked products from localStorage on component mount
   useEffect(() => {
     const likedProductsFromStorage = localStorage.getItem("likedProducts");
     if (likedProductsFromStorage) {
@@ -114,88 +133,10 @@ const WrapperComponent = ({ children }) => {
     }
   };
 
-  // Chuyển tự động các card
-  const mainCardRef = useRef(null);
-
-  useEffect(() => {
-    const mainCard = mainCardRef.current;
-    let isTransitioning = false;
-
-    const transitionEndHandler = () => {
-      isTransitioning = false;
-      mainCard.appendChild(mainCard.firstElementChild);
-      mainCard.style.transition = "none";
-      mainCard.style.transform = "translateX(0)";
-      setTimeout(() => {
-        mainCard.style.transition = "transform 0.5s ease";
-      });
-    };
-
-    const interval = setInterval(() => {
-      if (!isTransitioning) {
-        isTransitioning = true;
-        mainCard.style.transition = "transform 0.5s ease-out";
-        mainCard.style.transform = "translateX(-20%)";
-      }
-    }, 3000);
-
-    mainCard.addEventListener("transitionend", transitionEndHandler);
-
-    return () => {
-      clearInterval(interval);
-      mainCard.removeEventListener("transitionend", transitionEndHandler);
-    };
-  }, []);
-
-  const cardRefs = useRef([]);
-
-  useEffect(() => {
-    const refsArray = cardRefs.current;
-    const observers = refsArray.map((ref) => {
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            ref.classList.add(styles.visible);
-          }
-        },
-        { threshold: 0.1 }
-      );
-
-      if (ref) {
-        observer.observe(ref);
-      }
-
-      return observer;
-    });
-
-    return () => {
-      observers.forEach((observer, index) => {
-        if (refsArray[index]) {
-          observer.unobserve(refsArray[index]);
-        }
-      });
-    };
-  }, []);
-
   return (
     <div>
-      {/* Sản phẩm đề xuất */}
-      <div className={styles["product-recommend-wrapper"]}>
-        <div className={styles["product-recommend"]}>
-          <h2>Sản phẩm đề xuất</h2>
-          <div className={styles["main-card"]} ref={mainCardRef}>
-            {products.map((product) => (
-              <div key={product.id} className={`${styles.card} `}>
-                <img src={`/image/${product.image}`} alt={product.name} />
-                <h3>{product.name}</h3>
-                <p className={styles["price"]}>{product.price}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      {/* Danh sách sản phẩm */}
-      <WrapperComponent>
+    <NavBar/>
+    <WrapperComponent>
       <MainCard isModalOpen={isModalOpen}>
         <div className={styles["productRecommendWrapper"]}>
           <div className={styles["product-wrapper"]}>
@@ -252,9 +193,8 @@ const WrapperComponent = ({ children }) => {
           </div>
         </div>
       </MainCard>
-          </WrapperComponent>
-      {/* Hiệu ứng loading */}
-      {isLoading && (
+    </WrapperComponent>
+    {isLoading && (
         <div className="fixed top-0 left-0 right-0 bottom-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center">
           <div className="relative flex items-center justify-center">
             <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-800"></div>
@@ -323,9 +263,9 @@ const WrapperComponent = ({ children }) => {
             </div>
           </div>
         </div>
-      )}
+      )}   
     </div>
   );
 };
 
-export default ProductCard;
+export default CategoryPage;

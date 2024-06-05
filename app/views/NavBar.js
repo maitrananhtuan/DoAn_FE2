@@ -3,39 +3,50 @@
 
 import React, { useState, useEffect } from "react";
 import styles from "../css/app.module.css";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faShoppingCart } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
 
 const NavBar = () => {
   const [activeItem, setActiveItem] = useState("Trang chủ");
-  const [isVisible, setIsVisible] = useState(true);
-  const [prevScrollPos, setPrevScrollPos] = useState(0);
+  const [categories, setCategories] = useState([]);
 
-  const handleScroll = () => {
-    const currentScrollPos = window.scrollY;
-    const isScrolledUp = prevScrollPos > currentScrollPos;
-    setIsVisible(isScrolledUp);
-    setPrevScrollPos(currentScrollPos);
-  };
-
+  // Load danh mục khi component được render
   useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get("/api/category");
+        setCategories(response.data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
     };
-  }, [prevScrollPos]);
+
+    fetchCategories();
+  }, []);
+
+  const handleCategoryClick = async (categoryId) => {
+    try {
+      const response = await axios.get(`/api/category_id?categoryId=${categoryId}`);
+      console.log(response.data); // Hiển thị danh sách sản phẩm từ danh mục được chọn
+      // Redirect đến trang hiển thị sản phẩm của danh mục
+      window.location.href = `/category/${categoryId}`;
+    } catch (error) {
+      console.error('Error fetching products by category:', error);
+    }
+  };
+  
 
   return (
-    <div id="wrapper" className={`${styles["navbar-wrapper"]} ${isVisible ? styles.visible : styles.hidden}`}>
+    <div id="wrapper" className={`${styles["navbar-wrapper"]}`}>
       <div className={styles["header"]}>
         <nav className={styles["container"]}>
-          <a className={styles["logo"]} href="#">
+          <a className={styles["logo"]} href="/">
             TechZone
           </a>
           <ul className={styles["main-menu"]}>
             <li>
-              <a 
+              <a
                 href="/"
                 className={activeItem === "Trang chủ" ? styles.active : ""}
                 onClick={() => setActiveItem("Trang chủ")}
@@ -44,58 +55,34 @@ const NavBar = () => {
               </a>
             </li>
             <li>
-  <a 
-    href="/introduce"
-    className={activeItem === "Giới thiệu" ? styles.active : ""}
-    onClick={() => setActiveItem("Giới thiệu")}
-  >
-    Giới thiệu
-  </a>
-</li>
-
+              <a
+                href="/introduce"
+                className={activeItem === "Giới thiệu" ? styles.active : ""}
+                onClick={() => setActiveItem("Giới thiệu")}
+              >
+                Giới thiệu
+              </a>
+            </li>
             <li>
               <a href="/product">Sản phẩm &#9660;</a>
               <ul className={styles["sub-menu"]}>
-                <li>
-                  <a 
-                    href="#"
-                    className={activeItem === "Sam Sung" ? styles.active : ""}
-                    onClick={() => setActiveItem("Sam Sung")}
-                  >
-                    Sam Sung
-                  </a>
-                </li>
-                <li>
-                  <a 
-                    href="#"
-                    className={activeItem === "Iphone" ? styles.active : ""}
-                    onClick={() => setActiveItem("Iphone")}
-                  >
-                    Iphone
-                  </a>
-                </li>
-                <li>
-                  <a 
-                    href="#"
-                    className={activeItem === "Redmi" ? styles.active : ""}
-                    onClick={() => setActiveItem("Redmi")}
-                  >
-                    Redmi
-                  </a>
-                </li>
-                <li>
-                  <a 
-                    href="#"
-                    className={activeItem === "ROG Phone" ? styles.active : ""}
-                    onClick={() => setActiveItem("ROG Phone")}
-                  >
-                    ROG Phone
-                  </a>
-                </li>
+              {categories.map((category) => (
+    <li key={category.id}>
+      <a
+        href="#"
+        onClick={(event) => {
+          event.preventDefault();
+          handleCategoryClick(category.id);
+        }}
+      >
+        {category.name}
+      </a>
+    </li>
+  ))}
               </ul>
             </li>
             <li>
-              <a 
+              <a
                 href="/contact"
                 className={activeItem === "Liên hệ" ? styles.active : ""}
                 onClick={() => setActiveItem("Liên hệ")}
