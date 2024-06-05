@@ -14,12 +14,16 @@ function stripHtmlTags(html) {
   return doc.body.textContent || "";
 }
 
+const ProductsPerPage = 5;
+
 const ProductCard = () => {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [likedProducts, setLikedProducts] = useState([]);
+  const [visibleProducts, setVisibleProducts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const MainCard = styled.div`
   transition: transform 0.5s ease;
@@ -177,6 +181,17 @@ const WrapperComponent = ({ children }) => {
     };
   }, []);
 
+  //phân trang
+  // Xác định danh sách sản phẩm đã hiển thị
+  useEffect(() => {
+    setVisibleProducts(products.slice(0, currentPage * ProductsPerPage));
+  }, [currentPage, products]);
+
+  // Xử lý khi nhấn nút "Load More"
+  const handleLoadMore = () => {
+    setCurrentPage((prevPage) => prevPage + 1);
+  };
+
   return (
     <div>
       {/* Sản phẩm đề xuất */}
@@ -202,7 +217,7 @@ const WrapperComponent = ({ children }) => {
             <div className={styles["product"]}>
               <h2>Sản phẩm</h2>
               <div className={styles["main-card"]}>
-                {products.map((product) => (
+                {visibleProducts.map((product) => (
                   <div
                     key={product.id}
                     className={`${styles.card} `}
@@ -248,6 +263,10 @@ const WrapperComponent = ({ children }) => {
                   </div>
                 ))}
               </div>
+              {/* Hiển thị nút "Load More" nếu còn sản phẩm chưa hiển thị */}
+      {visibleProducts.length < products.length && (
+        <button onClick={handleLoadMore}>Load More</button>
+      )}
             </div>
           </div>
         </div>

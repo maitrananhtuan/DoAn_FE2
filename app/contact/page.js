@@ -8,37 +8,36 @@ import FooterProduct from '@/app/views/Footer';
 const ContactPage = () => {
   return (
     <div>
-      <NavBar/>
+      <NavBar />
       <div className={styles.container}>
-      <div className={styles.contactInfo}>
-        <div className={styles.contactInfoItem}>
-          <p>Địa chỉ: Số 123, Đường ABC, Thành phố XYZ</p>
+        <div className={styles.contactInfo}>
+
+          <ul className={styles.contact}>
+            <li className={styles.contactChil}>Add: 39 Nguyen Hue st., HCM city</li>
+            <li className={styles.contactChil}>Email: smart@mail.com</li>
+            <li className={styles.contactChil}>Phone: 0123 456 789</li>
+            <li className={styles.contactChil}>Fax: +84 123456789</li>
+          </ul>
+          
         </div>
-        <div className={styles.contactInfoItem}>
-          <p>Email: example@example.com</p>
-        </div>
-        <div className={styles.contactInfoItem}>
-          <p>Điện thoại: 0123 456 789</p>
-        </div>
+        <form className={styles.contactForm}>
+          <h2>Gửi tin nhắn cho chúng tôi</h2>
+          <div className={styles.formGroup}>
+            <label htmlFor="name">Họ và tên:</label>
+            <input type="text" id="name" name="name" required />
+          </div>
+          <div className={styles.formGroup}>
+            <label htmlFor="email">Email:</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+          <div className={styles.formGroup}>
+            <label htmlFor="message">Tin nhắn:</label>
+            <textarea id="message" name="message" rows="4" required></textarea>
+          </div>
+          <button className={styles.buttonSend} type="submit">Gửi</button>
+        </form>
       </div>
-      <form className={styles.contactForm}>
-        <h2>Gửi tin nhắn cho chúng tôi</h2>
-        <div className={styles.formGroup}>
-          <label htmlFor="name">Họ và tên:</label>
-          <input type="text" id="name" name="name" required />
-        </div>
-        <div className={styles.formGroup}>
-          <label htmlFor="email">Email:</label>
-          <input type="email" id="email" name="email" required />
-        </div>
-        <div className={styles.formGroup}>
-          <label htmlFor="message">Tin nhắn:</label>
-          <textarea id="message" name="message" rows="4" required></textarea>
-        </div>
-        <button type="submit">Gửi</button>
-      </form>
-    </div>
-    <FooterProduct/>
+      <FooterProduct />
     </div>
   );
 }
