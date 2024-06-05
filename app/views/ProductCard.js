@@ -7,7 +7,7 @@ import axios from "axios";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faHeart } from "@fortawesome/free-solid-svg-icons";
-import { StyleSheetManager } from 'styled-components';
+import { StyleSheetManager } from "styled-components";
 
 function stripHtmlTags(html) {
   const doc = new DOMParser().parseFromString(html, "text/html");
@@ -24,21 +24,23 @@ const ProductCard = () => {
   const [likedProducts, setLikedProducts] = useState([]);
   const [visibleProducts, setVisibleProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [cartItems, setCartItems] = useState([]);
+  const [cartItemCount, setCartItemCount] = useState(0); // Biến state để lưu số lượng sản phẩm trong giỏ hàng
 
   const MainCard = styled.div`
-  transition: transform 0.5s ease;
-  transform: translateY(${props => (props.isModalOpen ? '-100%' : '0')});
-  visibility: ${props => (props.isModalOpen ? 'hidden' : 'visible')};
-  opacity: ${props => (props.isModalOpen ? '0' : '1')};
-`;
+    transition: transform 0.5s ease;
+    transform: translateY(${(props) => (props.isModalOpen ? "-100%" : "0")});
+    visibility: ${(props) => (props.isModalOpen ? "hidden" : "visible")};
+    opacity: ${(props) => (props.isModalOpen ? "0" : "1")};
+  `;
 
-const WrapperComponent = ({ children }) => {
-  return (
-    <StyleSheetManager shouldForwardProp={(prop) => prop !== 'isModalOpen'}>
-      {children}
-    </StyleSheetManager>
-  );
-};
+  const WrapperComponent = ({ children }) => {
+    return (
+      <StyleSheetManager shouldForwardProp={(prop) => prop !== "isModalOpen"}>
+        {children}
+      </StyleSheetManager>
+    );
+  };
 
   // Fetch product data
   useEffect(() => {
@@ -91,6 +93,14 @@ const WrapperComponent = ({ children }) => {
     }
   }, []);
 
+  // Load cart items from localStorage on component mount
+  useEffect(() => {
+    const cartItemsFromStorage = localStorage.getItem("cartItems");
+    if (cartItemsFromStorage) {
+      setCartItems(JSON.parse(cartItemsFromStorage));
+    }
+  }, []);
+
   // tăng like
   const handleLikeClick = async (productId) => {
     try {
@@ -102,7 +112,9 @@ const WrapperComponent = ({ children }) => {
 
         // Tăng số lượng like
         const updatedProducts = products.map((product) =>
-          product.id === productId ? { ...product, likes: product.likes + 1 } : product
+          product.id === productId
+            ? { ...product, likes: product.likes + 1 }
+            : product
         );
         setProducts(updatedProducts);
 
@@ -110,7 +122,10 @@ const WrapperComponent = ({ children }) => {
         setLikedProducts([...likedProducts, productId]);
 
         // Lưu danh sách các sản phẩm đã được like vào localStorage
-        localStorage.setItem("likedProducts", JSON.stringify([...likedProducts, productId]));
+        localStorage.setItem(
+          "likedProducts",
+          JSON.stringify([...likedProducts, productId])
+        );
       }
     } catch (error) {
       console.error("Error increasing view count:", error);
@@ -136,18 +151,25 @@ const WrapperComponent = ({ children }) => {
     };
 
     const interval = setInterval(() => {
-      if (!isTransitioning) {
+      if (!isTransitioning && mainCard) {
+        // Kiểm tra mainCard có tồn tại trước khi sử dụng
         isTransitioning = true;
         mainCard.style.transition = "transform 0.5s ease-out";
         mainCard.style.transform = "translateX(-20%)";
       }
     }, 3000);
 
-    mainCard.addEventListener("transitionend", transitionEndHandler);
+    if (mainCard) {
+      // Kiểm tra mainCard có tồn tại trước khi gọi addEventListener
+      mainCard.addEventListener("transitionend", transitionEndHandler);
+    }
 
     return () => {
       clearInterval(interval);
-      mainCard.removeEventListener("transitionend", transitionEndHandler);
+      if (mainCard) {
+        // Kiểm tra mainCard có tồn tại trước khi gọi removeEventListener
+        mainCard.removeEventListener("transitionend", transitionEndHandler);
+      }
     };
   }, []);
 
@@ -192,159 +214,206 @@ const WrapperComponent = ({ children }) => {
     setCurrentPage((prevPage) => prevPage + 1);
   };
 
-  return (
-    <div>
-      {/* Sản phẩm đề xuất */}
-      <div className={styles["product-recommend-wrapper"]}>
-        <div className={styles["product-recommend"]}>
-          <h2>Sản phẩm đề xuất</h2>
-          <div className={styles["main-card"]} ref={mainCardRef}>
-            {products.map((product) => (
-              <div key={product.id} className={`${styles.card} `}>
-                <img src={`/image/${product.image}`} alt={product.name} />
-                <h3>{product.name}</h3>
-                <p className={styles["price"]}>{product.price}</p>
-              </div>
-            ))}
+  const handleAddToCart = (product) => {
+    // Check if the product is already in cart
+    if (!cartItems.some((item) => item.id === product.id)) {
+      // If not, add it to cart
+      const updatedCartItems = [
+        ...cartItems,
+        {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.image,
+        },
+      ];
+      setCartItems(updatedCartItems);
+      localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
+      setCartItemCount(updatedCartItems.length); // Cập nhật số lượng sản phẩm trong giỏ hàng
+      localStorage.setItem("cartCount", updatedCartItems.length);
+    }
+  };
+
+    return (
+      <div>
+        {/* Sản phẩm đề xuất */}
+        <div className={styles["product-recommend-wrapper"]}>
+          <div className={styles["product-recommend"]}>
+            <h2>Sản phẩm đề xuất</h2>
+            <div className={styles["main-card"]} ref={mainCardRef}>
+              {products.map((product) => (
+                <div key={product.id} className={`${styles.card} `}>
+                  <img src={`/image/${product.image}`} alt={product.name} />
+                  <h3>{product.name}</h3>
+                  <p className={styles["price"]}>{product.price}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-      {/* Danh sách sản phẩm */}
-      <WrapperComponent>
-      <MainCard isModalOpen={isModalOpen}>
-        <div className={styles["productRecommendWrapper"]}>
-          <div className={styles["product-wrapper"]}>
-            <div className={styles["product"]}>
-              <h2>Sản phẩm</h2>
-              <div className={styles["main-card"]}>
-                {visibleProducts.map((product) => (
-                  <div
-                    key={product.id}
-                    className={`${styles.card} `}
-                    
-                  >
-                    <img src={`/image/${product.image}`} alt={product.name} 
-                    onClick={() => {
-                      handleProductClick(product);
-                      handleViewClick(product.id);
-                    }}/>
-                    <h3>{product.name}</h3>
-                    <p className={styles["price"]}>{product.price}</p>
-                    <div className={styles.icons}>
-                      <span className={styles.viewIcon}>
-                        <FontAwesomeIcon icon={faEye} />
-                        {product.views}
-                      </span>
-
-                      <span className={styles.likeIcon}>
-                        <FontAwesomeIcon
-                          icon={faHeart}
-                          onClick={(e) => {
-                            e.stopPropagation(); // Ngăn chặn sự kiện click lan sang phần tử cha
-                            handleLikeClick(product.id);
+        {/* Danh sách sản phẩm */}
+        <WrapperComponent>
+          <MainCard isModalOpen={isModalOpen}>
+            <div className={styles["productRecommendWrapper"]}>
+              <div className={styles["product-wrapper"]}>
+                <div className={styles["product"]}>
+                  <h2>Sản phẩm</h2>
+                  <div className={styles["main-card"]}>
+                    {visibleProducts.map((product) => (
+                      <div key={product.id} className={`${styles.card} `}>
+                        <img
+                          src={`/image/${product.image}`}
+                          alt={product.name}
+                          onClick={() => {
+                            handleProductClick(product);
+                            handleViewClick(product.id);
                           }}
-                          style={{ color: likedProducts.includes(product.id) ? 'red' : 'black' }}
                         />
-                        {product.likes}
-                      </span>
+                        <h3>{product.name}</h3>
+                        <p className={styles["price"]}>{product.price}</p>
+                        <div className={styles.icons}>
+                          <span className={styles.viewIcon}>
+                            <FontAwesomeIcon icon={faEye} />
+                            {product.views}
+                          </span>
 
-                    </div>
-                    <div className={styles.buttons}>
-                      <span>
-                        <a className={styles["button-buy"]}>Buy</a>
-                      </span>
-                    </div>
-                    <div className={styles.addtocart}>
-                      <span>
-                        <button class={styles["purchase-button"]} data-content="Add to cart">Add to cart</button>
-                        {/* <a className={styles["button-buy"]}>Add to cart</a> */}
-                      </span>
-                    </div>
+                          <span className={styles.likeIcon}>
+                            <FontAwesomeIcon
+                              icon={faHeart}
+                              onClick={(e) => {
+                                e.stopPropagation(); // Ngăn chặn sự kiện click lan sang phần tử cha
+                                handleLikeClick(product.id);
+                              }}
+                              style={{
+                                color: likedProducts.includes(product.id)
+                                  ? "red"
+                                  : "black",
+                              }}
+                            />
+                            {product.likes}
+                          </span>
+                        </div>
+                        <div className={styles.buttons}>
+                          <span>
+                            <a className={styles["button-buy"]}>Buy</a>
+                          </span>
+                        </div>
+                        <div className={styles.addtocart}>
+                          <span>
+                            <button
+                              class={styles["purchase-button"]}
+                              data-content="Add to cart"
+                              onClick={() => handleAddToCart(product)}
+                            >
+                              Add to cart
+                            </button>
+                            {/* <a className={styles["button-buy"]}>Add to cart</a> */}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                  {/* Hiển thị nút "Load More" nếu còn sản phẩm chưa hiển thị */}
+                  {visibleProducts.length < products.length && (
+                    <button onClick={handleLoadMore}>Load More</button>
+                  )}
+                </div>
               </div>
-              {/* Hiển thị nút "Load More" nếu còn sản phẩm chưa hiển thị */}
-      {visibleProducts.length < products.length && (
-        <button onClick={handleLoadMore}>Load More</button>
-      )}
+            </div>
+          </MainCard>
+        </WrapperComponent>
+        {/* Hiệu ứng loading */}
+        {isLoading && (
+          <div className="fixed top-0 left-0 right-0 bottom-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center">
+            <div className="relative flex items-center justify-center">
+              <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-800"></div>
+              <div className="absolute text-white text-xl">Loading...</div>
             </div>
           </div>
-        </div>
-      </MainCard>
-          </WrapperComponent>
-      {/* Hiệu ứng loading */}
-      {isLoading && (
-        <div className="fixed top-0 left-0 right-0 bottom-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center">
-          <div className="relative flex items-center justify-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-800"></div>
-            <div className="absolute text-white text-xl">Loading...</div>
-          </div>
-        </div>
-      )}
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed z-10 inset-0 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div
-              className="fixed inset-0 transition-opacity"
-              aria-hidden="true"
-            >
-              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-            </div>
-            <span
-              className="hidden sm:inline-block sm:align-middle sm:h-screen"
-              aria-hidden="true"
-            >
-              &#8203;
-            </span>
-            <div className="inline-block align-middle bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full max-w-4xl">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex justify-between items-center">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                      {selectedProduct ? selectedProduct.name : ""}
-                    </h3>
-                    <button type="button" onClick={() => setIsModalOpen(false)} className="bg-transparent border-0 p-0 leading-none text-black opacity-50 cursor-pointer focus:outline-none" data-bs-dismiss="modal" aria-label="Close">
-                      <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                  <hr className="my-2 border-b-2 border-gray-300" />
-                  <div className="flex items-center sm:flex-row sm:items-start sm:justify-start">
-                    <div className="sm:mr-4">
-                      <img
-                        src={`/image/${selectedProduct.image}`}
-                        alt={selectedProduct.name}
-                        style={{ minWidth: "300px", height: "auto" }}
-                      />
-                    </div>
-                    <div className="mt-2 sm:mt-0 sm:flex-grow">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {selectedProduct.price}
+        )}
+        {/* Modal */}
+        {isModalOpen && (
+          <div className="fixed z-10 inset-0 overflow-y-auto">
+            <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+              <div
+                className="fixed inset-0 transition-opacity"
+                aria-hidden="true"
+              >
+                <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+              </div>
+              <span
+                className="hidden sm:inline-block sm:align-middle sm:h-screen"
+                aria-hidden="true"
+              >
+                &#8203;
+              </span>
+              <div className="inline-block align-middle bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full max-w-4xl">
+                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex justify-between items-center">
+                      <h3
+                        className="text-lg leading-6 font-medium text-gray-900"
+                        id="modal-title"
+                      >
+                        {selectedProduct ? selectedProduct.name : ""}
                       </h3>
-                      <p className="text-gray-700 h-full overflow-auto h-64">
-                        {stripHtmlTags(selectedProduct.description)}
-                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setIsModalOpen(false)}
+                        className="bg-transparent border-0 p-0 leading-none text-black opacity-50 cursor-pointer focus:outline-none"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                      >
+                        <svg
+                          className="h-6 w-6"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                    <hr className="my-2 border-b-2 border-gray-300" />
+                    <div className="flex items-center sm:flex-row sm:items-start sm:justify-start">
+                      <div className="sm:mr-4">
+                        <img
+                          src={`/image/${selectedProduct.image}`}
+                          alt={selectedProduct.name}
+                          style={{ minWidth: "300px", height: "auto" }}
+                        />
+                      </div>
+                      <div className="mt-2 sm:mt-0 sm:flex-grow">
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {selectedProduct.price}
+                        </h3>
+                        <p className="text-gray-700 h-full overflow-auto h-64">
+                          {stripHtmlTags(selectedProduct.description)}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  type="button"
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
-                >
-                  Close
-                </button>
+                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                  <button
+                    onClick={() => setIsModalOpen(false)}
+                    type="button"
+                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
+        )}
+      </div>
+    );
+  };
 export default ProductCard;

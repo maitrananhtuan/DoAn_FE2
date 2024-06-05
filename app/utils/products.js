@@ -11,10 +11,10 @@ const connection = mysql.createConnection({
 });
 
 // Hàm để lấy tất cả sản phẩm từ cơ sở dữ liệu
-export function getAllProducts() {
+export function getAllProducts(page, perPage) {
   return new Promise((resolve, reject) => {
     // Truy vấn tất cả sản phẩm từ bảng products trong cơ sở dữ liệu
-    connection.query('SELECT * FROM products', (error, results) => {
+    connection.query('SELECT * FROM products ', (error, results) => {
       if (error) {
         reject(error); // Trả về lỗi nếu có lỗi trong quá trình truy vấn
       } else {
